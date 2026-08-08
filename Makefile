@@ -9,6 +9,5 @@ TWEAK_NAME = MinecraftHelper
 
 MinecraftHelper_FILES = Tweak.xm MHSubstrate.mm MHLogger.mm MHFeatures.mm OverlayManager.mm
 MinecraftHelper_CFLAGS = -fobjc-arc -Wno-deprecated-declarations -Wno-unused-variable -Wno-unused-parameter
-MinecraftHelper_INSTALL_PATH = /usr/lib
 
 include $(THEOS_MAKE_PATH)/tweak.mk
