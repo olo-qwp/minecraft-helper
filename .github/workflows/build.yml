@@ -34,7 +34,13 @@ jobs:
 
       - name: Configure scheme & arch
         run: |
-          sed -i "s|^Architecture:.*|Architecture: ${{ matrix.arch }}|" control
+          python3 -c '
+import re
+p = "control"
+s = open(p).read()
+s = re.sub(r"^Architecture:.*$", "Architecture: ${{ matrix.arch }}", s, flags=re.M)
+open(p, "w").write(s)
+'
           if [ "${{ matrix.scheme }}" = "rootless" ]; then
             echo "THEOS_PACKAGE_SCHEME=rootless" >> "$GITHUB_ENV"
           fi
