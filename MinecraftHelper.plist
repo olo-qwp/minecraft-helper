@@ -7,10 +7,12 @@
 		<key>Bundles</key>
 		<array>
 			<string>com.mojang.minecraftpe</string>
+			<string>com.mojang.minecraftpe.preview</string>
 		</array>
 		<key>Executables</key>
 		<array>
 			<string>Minecraft</string>
+			<string>minecraftpe</string>
 		</array>
 	</dict>
 </dict>

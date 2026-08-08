@@ -1,8 +1,10 @@
 // MinecraftHelper — iOS Minecraft Bedrock 辅助 tweak
 // 注入入口：%ctor
-//   · MSFindSymbol 批量探测 10 个 Bedrock C++ mangled 名（命中记日志，为按符号 hook 铺路）
-//   · 符号剥离返回 NULL 属正常（iOS MCPE 深搜确认符号剥离）——全部 hook 条件化，绝不闪退
-//   · 无 substrate/ellekit 运行时（如 iGameGod 非越狱注入）时 hooks 休眠，UI/日志照常
+//  · %ctor 在 dyld 阶段执行（MobileLoader / iGameGod 均在 main() 之前注入）
+//  · ★ 铁律：%ctor 内绝不触碰 UIKit（UIWindow/UIButton 等）——此时 UIApplication 尚不存在，
+//    提前创建窗口不会显示（无UI）甚至触发崩溃（闪退）。UI 一律延迟到 app 启动完成后创建。
+//  · MSFindSymbol 批量探测 10 个 Bedrock C++ mangled 名（命中记日志，为按符号 hook 铺路）
+//  · 符号剥离返回 NULL 属正常（iOS MCPE 符号已剥离）——全部 hook 条件化，绝不闪退
 
 #import "MHCommon.h"
 #import "MHFeatures.h"
@@ -112,10 +114,18 @@ void MHInstallHooks(void) {
 }
 
 // ---- 注入入口 ----
+// 安全清单（%ctor 阶段只允许这些）：
+//   纯 C（fopen/fprintf/dlsym/dlopen/符号探测/hook 绑定）、Foundation（NSLog/NSFileManager/NSNotificationCenter 注册）
+// 禁止：UIWindow/UIButton/UIScreen 等一切 UIKit 界面操作、CADisplayLink
 %ctor {
     @autoreleasepool {
         MHLogPrint(MHLogLevelInfo, "============================================");
-        MHLogPrint(MHLogLevelInfo, "%s v%s injected into pid %d", MH_TWEAK_NAME, MH_VERSION, (int)getpid());
+        MHLogPrint(MHLogLevelInfo, "%s v%s injected into pid %d (stage: dyld-init)", MH_TWEAK_NAME, MH_VERSION, (int)getpid());
+
+        // 0. 进程身份（确认 Filter 匹配：Preview 与正式版同 bundle id com.mojang.minecraftpe）
+        NSString *bundleID = NSBundle.mainBundle.bundleIdentifier ?: @"(unknown)";
+        NSString *procName = NSProcessInfo.processInfo.processName ?: @"(unknown)";
+        MHLogPrint(MHLogLevelInfo, "process: bundle=%s exec=%s", bundleID.UTF8String, procName.UTF8String);
 
         // 1. 批量符号探测（10 个 Bedrock C++ mangled 名）
         MHProbeSymbols();
@@ -134,11 +144,27 @@ void MHInstallHooks(void) {
         // 3. 条件 hook（仅符号命中 + substrate 可用）
         MHInstallHooks();
 
-        // 4. 悬浮窗（主线程，避免注入时序问题）
-        dispatch_async(dispatch_get_main_queue(), ^{
-            [[OverlayManager sharedInstance] start];
+        // 4. UI 延迟启动（★ 修复无UI/闪退的核心）
+        //    方案：a) UIApplicationDidFinishLaunchingNotification 发出后 +2s（游戏进主界面）
+        //          b) 6s 兜底（防止通知已发出后才注入的极端场景）
+        //    scheduleStartWithDelay 内部再做主线程检查 + @try/@catch 兜底
+        static dispatch_once_t uiOnce;
+        dispatch_once(&uiOnce, ^{
+            [[NSNotificationCenter defaultCenter]
+                addObserverForName:UIApplicationDidFinishLaunchingNotification
+                            object:nil
+                             queue:[NSOperationQueue mainQueue]
+                        usingBlock:^(NSNotification *note) {
+                            MHLogPrint(MHLogLevelInfo, "app finished launching -> schedule overlay");
+                            [OverlayManager scheduleStartWithDelay:2.0];
+                        }];
+            dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(6 * NSEC_PER_SEC)),
+                           dispatch_get_main_queue(), ^{
+                MHLogPrint(MHLogLevelInfo, "fallback timer -> schedule overlay");
+                [OverlayManager scheduleStartWithDelay:0.5];
+            });
         });
 
-        MHLogPrint(MHLogLevelInfo, "%s v%s ctor complete", MH_TWEAK_NAME, MH_VERSION);
+        MHLogPrint(MHLogLevelInfo, "%s v%s ctor complete (UI deferred to post-launch)", MH_TWEAK_NAME, MH_VERSION);
     }
 }

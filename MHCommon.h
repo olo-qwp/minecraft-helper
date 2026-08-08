@@ -2,7 +2,7 @@
 #import <Foundation/Foundation.h>
 
 #define MH_TWEAK_NAME "MinecraftHelper"
-#define MH_VERSION    "1.0.0"
+#define MH_VERSION    "1.1.0"
 
 #import "MHSubstrate.h"
 #import "MHLogger.h"

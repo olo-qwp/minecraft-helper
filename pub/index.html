@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>MinecraftHelper — 下载中心</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "PingFang SC", sans-serif;
+    background: #0b0f14;
+    color: #e8edf2;
+    min-height: 100vh;
+    padding: 24px 16px calc(40px + env(safe-area-inset-bottom));
+  }
+  .hero { text-align: center; padding: 28px 0 20px; }
+  .logo {
+    width: 84px; height: 84px; margin: 0 auto 16px;
+    border-radius: 22px;
+    background: linear-gradient(145deg, #1e3a8a, #0e7490 55%, #059669);
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 800; font-size: 30px; letter-spacing: -1px;
+    color: #fff; box-shadow: 0 12px 32px rgba(14,116,144,.35);
+  }
+  h1 { font-size: 24px; font-weight: 700; letter-spacing: .3px; }
+  .tag { color: #8b98a5; font-size: 13px; margin-top: 6px; }
+  .badges { display: flex; justify-content: center; gap: 8px; margin-top: 12px; }
+  .badge {
+    font-size: 11px; padding: 4px 10px; border-radius: 999px;
+    background: rgba(14,116,144,.16); color: #5eead4;
+    border: 1px solid rgba(14,116,144,.35);
+  }
+  .card {
+    background: #141b24; border-radius: 18px; padding: 18px;
+    margin-top: 18px; border: 1px solid rgba(255,255,255,.06);
+  }
+  .card h2 { font-size: 15px; font-weight: 600; margin-bottom: 12px; color: #a7f3d0; }
+  .file {
+    display: flex; align-items: center; gap: 12px;
+    padding: 13px 12px; border-radius: 14px;
+    background: #1a232e; border: 1px solid rgba(255,255,255,.05);
+    margin-bottom: 10px; text-decoration: none; color: #e8edf2;
+  }
+  .file:active { transform: scale(.985); background: #1f2b38; }
+  .file .ic {
+    width: 42px; height: 42px; border-radius: 11px; flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center; font-size: 19px;
+  }
+  .ic-arm64 { background: rgba(14,116,144,.2); }
+  .ic-arm  { background: rgba(5,150,105,.2); }
+  .ic-dylib { background: rgba(168,85,247,.2); }
+  .file .meta { flex: 1; min-width: 0; }
+  .file .name { font-size: 14px; font-weight: 600; }
+  .file .sub  { font-size: 11.5px; color: #8b98a5; margin-top: 3px; }
+  .file .arrow { color: #5eead4; font-size: 16px; }
+  ol { padding-left: 20px; font-size: 13px; line-height: 1.9; color: #c3cdd6; }
+  ol li::marker { color: #5eead4; font-weight: 700; }
+  .warn {
+    margin-top: 18px; padding: 14px; border-radius: 14px;
+    background: rgba(234,179,8,.08); border: 1px solid rgba(234,179,8,.25);
+    font-size: 12px; color: #fde68a; line-height: 1.7;
+  }
+  .foot { text-align: center; color: #4b5563; font-size: 11px; margin-top: 22px; }
+  code { background: #0b0f14; padding: 2px 6px; border-radius: 6px; font-size: 11.5px; color: #7dd3fc; }
+</style>
+</head>
+<body>
+  <div class="hero">
+    <div class="logo">MH</div>
+    <h1>MinecraftHelper</h1>
+    <div class="tag">iOS Minecraft Bedrock 多功能辅助 · v1.0.0</div>
+    <div class="badges">
+      <span class="badge">🎛 悬浮窗</span>
+      <span class="badge">🛡 12 项功能</span>
+      <span class="badge">📋 C++ 日志导出</span>
+      <span class="badge">🧬 10 符号探测</span>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>📦 下载</h2>
+
+    <a class="file" href="com.minis.minecrafthelper_1.0.0_iphoneos-arm64.deb">
+      <span class="ic ic-arm64">🕳</span>
+      <span class="meta">
+        <span class="name">rootless .deb（推荐）</span>
+        <span class="sub">palera1n / Dopamine / 新式越狱 · arm64+arm64e</span>
+      </span>
+      <span class="arrow">›</span>
+    </a>
+
+    <a class="file" href="com.minis.minecrafthelper_1.0.0_iphoneos-arm.deb">
+      <span class="ic ic-arm">📀</span>
+      <span class="meta">
+        <span class="name">rootful .deb</span>
+        <span class="sub">unc0ver / checkra1n 传统越狱 · arm64</span>
+      </span>
+      <span class="arrow">›</span>
+    </a>
+
+    <a class="file" href="MinecraftHelper-rootless.dylib">
+      <span class="ic ic-dylib">🧩</span>
+      <span class="meta">
+        <span class="name">iGameGod dylib（无越狱）</span>
+        <span class="sub">Tweaks → Import Tweak 直接导入 · 无 substrate 也不闪退</span>
+      </span>
+      <span class="arrow">›</span>
+    </a>
+  </div>
+
+  <div class="card">
+    <h2>⚙️ 安装方式</h2>
+    <ol>
+      <li><b>越狱</b>：下载对应 .deb，用 Sileo / Zebra / Filza 安装，重启 Minecraft。</li>
+      <li><b>iGameGod</b>：下载 dylib → Tweaks 标签 → ➕ → 新建文件夹 → Import Tweak → 选择文件。</li>
+      <li>进游戏后点屏幕右侧 <code>MH</code> 悬浮球打开菜单。</li>
+      <li>导出日志：菜单 → <code>导出日志</code>（分享面板）/ <code>复制日志</code>。</li>
+    </ol>
+  </div>
+
+  <div class="card">
+    <h2>🧬 符号探测结果（运行日志）</h2>
+    <ol style="font-size:12px; font-family: ui-monospace, monospace;">
+      <li>启动即用 MSFindSymbol 批量探测 10 个 Bedrock C++ mangled 名</li>
+      <li>命中 → 自动按符号 hook；剥离（NULL）→ 该项显示「符号缺失」</li>
+      <li>iOS MCPE 二进制已剥离符号，未命中属预期；命中即生效</li>
+      <li>所有 hook 条件化 + 空指针安全，无 substrate 环境也绝不闪退</li>
+    </ol>
+  </div>
+
+  <div class="warn">⚠️ 免责声明：仅限单机/自用测试。多人服务器使用辅助可能违反服务条款并被封号，风险自负。本隧道为临时链接，由 localhost.run 提供。</div>
+
+  <div class="foot">MinecraftHelper v1.0.0 · Theos + GitHub Actions 构建 · com.minis.minecrafthelper</div>
+</body>
+</html>

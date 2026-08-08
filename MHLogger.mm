@@ -83,10 +83,28 @@ NSString *MHLogFilePath(void) {
     static NSString *path = nil;
     static dispatch_once_t once;
     dispatch_once(&once, ^{
-        NSArray *dirs = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
-        if (dirs.count > 0) {
-            path = [[[dirs firstObject] stringByAppendingPathComponent:@"MinecraftHelper.log"] copy];
+        // 多级回退：Documents → Caches → tmp（注入早期沙盒可能未就绪，任一级可用即可）
+        NSArray *bases = @[
+            [NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES) firstObject],
+            [NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES) firstObject],
+            NSTemporaryDirectory(),
+        ];
+        for (NSString *b in bases) {
+            if (!b || b.length == 0) continue;
+            BOOL isDir = NO;
+            BOOL ok = [[NSFileManager defaultManager] fileExistsAtPath:b isDirectory:&isDir];
+            if (!ok) {
+                ok = [[NSFileManager defaultManager] createDirectoryAtPath:b
+                                               withIntermediateDirectories:YES
+                                                                attributes:nil
+                                                                     error:NULL];
+            }
+            if (ok && isDir) {
+                path = [[b stringByAppendingPathComponent:@"MinecraftHelper.log"] copy];
+                break;
+            }
         }
+        if (!path) path = @"/tmp/MinecraftHelper.log"; // 最终兜底
     });
     return path;
 }

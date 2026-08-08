@@ -50,10 +50,37 @@ static double MHMemoryUsedMB(void) {
     return s;
 }
 
+#pragma mark - 延迟启动（★ 防闪退核心：UI 一律在 app 启动完成后创建）
+
++ (void)scheduleStartWithDelay:(NSTimeInterval)delay {
+    if (delay <= 0) delay = 0.5;
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(delay * NSEC_PER_SEC)),
+                   dispatch_get_main_queue(), ^{
+        @try {
+            [[OverlayManager sharedInstance] start];
+        } @catch (NSException *e) {
+            // 兜底：任何 UI 异常都吞掉并记日志，绝不影响游戏进程
+            MHLogPrint(MHLogLevelError, "overlay start exception: %s: %s",
+                       e.name ? e.name.UTF8String : "?",
+                       e.reason ? e.reason.UTF8String : "?");
+        }
+    });
+}
+
 #pragma mark - 启动
 
 - (void)start {
     if (_window) return;
+    // 守卫 1：必须是主线程
+    if (![NSThread isMainThread]) {
+        [self performSelectorOnMainThread:@selector(start) withObject:nil waitUntilDone:NO];
+        return;
+    }
+    // 守卫 2：UIApplication 必须就绪（无 UIApplication 时绝不创建 UI，避免注入早期崩溃）
+    if (!UIApplication.sharedApplication) {
+        MHLogPrint(MHLogLevelWarn, "overlay skipped: UIApplication not ready yet");
+        return;
+    }
     UIWindow *w = [[UIWindow alloc] initWithFrame:[UIScreen mainScreen].bounds];
     w.windowLevel = UIWindowLevelStatusBar + 100; // 悬浮于游戏之上，但不抢占 key（游戏触摸不受影响）
     w.hidden = NO;
@@ -61,6 +88,8 @@ static double MHMemoryUsedMB(void) {
     w.userInteractionEnabled = YES;
     UIViewController *vc = [UIViewController new];
     vc.view.backgroundColor = [UIColor clearColor];
+    // ★ 触摸穿透：root 视图不拦截触摸，游戏操作不被挡；只有悬浮球/菜单子视图自己响应
+    vc.view.userInteractionEnabled = NO;
     w.rootViewController = vc;
     _window = w;
 
