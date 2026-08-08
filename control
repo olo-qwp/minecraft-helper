@@ -1,6 +1,6 @@
 Package: com.minis.minecrafthelper
 Name: MinecraftHelper
-Version: 1.1.0
+Version: 1.2.0
 Architecture: iphoneos-arm64
 Description: Minecraft Bedrock 多功能辅助：悬浮窗、C++ 日志导出、10 符号探测、12 项功能。越狱(substrate/ellekit)与 iGameGod 注入均可用。
 Maintainer: Minis

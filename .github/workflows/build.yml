@@ -60,6 +60,11 @@ jobs:
         run: |
           mkdir -p dylib-out
           find .theos -name "MinecraftHelper.dylib" -exec cp {} dylib-out/ \;
+          # 提取纯 arm64 瘦版（iGameGod 注入最稳：单架构避免注入器对 fat 处理问题）
+          if [ -f .theos/obj/arm64/MinecraftHelper.dylib ]; then
+            cp .theos/obj/arm64/MinecraftHelper.dylib dylib-out/MinecraftHelper-arm64.dylib
+            echo "arm64 thin dylib extracted"
+          fi
           ls -la dylib-out/
 
       - name: Upload .deb

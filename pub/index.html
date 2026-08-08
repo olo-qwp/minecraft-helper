@@ -24,7 +24,7 @@
   }
   h1 { font-size: 24px; font-weight: 700; letter-spacing: .3px; }
   .tag { color: #8b98a5; font-size: 13px; margin-top: 6px; }
-  .badges { display: flex; justify-content: center; gap: 8px; margin-top: 12px; }
+  .badges { display: flex; justify-content: center; gap: 8px; margin-top: 12px; flex-wrap: wrap; }
   .badge {
     font-size: 11px; padding: 4px 10px; border-radius: 999px;
     background: rgba(14,116,144,.16); color: #5eead4;
@@ -60,6 +60,11 @@
     background: rgba(234,179,8,.08); border: 1px solid rgba(234,179,8,.25);
     font-size: 12px; color: #fde68a; line-height: 1.7;
   }
+  .fix {
+    margin-top: 18px; padding: 14px; border-radius: 14px;
+    background: rgba(16,185,129,.07); border: 1px solid rgba(16,185,129,.25);
+    font-size: 12px; color: #a7f3d0; line-height: 1.7;
+  }
   .foot { text-align: center; color: #4b5563; font-size: 11px; margin-top: 22px; }
   code { background: #0b0f14; padding: 2px 6px; border-radius: 6px; font-size: 11.5px; color: #7dd3fc; }
 </style>
@@ -68,19 +73,20 @@
   <div class="hero">
     <div class="logo">MH</div>
     <h1>MinecraftHelper</h1>
-    <div class="tag">iOS Minecraft Bedrock 多功能辅助 · v1.0.0</div>
+    <div class="tag">iOS Minecraft Bedrock 辅助 · v1.1.0 · 支持 Preview 与全版本</div>
     <div class="badges">
       <span class="badge">🎛 悬浮窗</span>
       <span class="badge">🛡 12 项功能</span>
       <span class="badge">📋 C++ 日志导出</span>
       <span class="badge">🧬 10 符号探测</span>
+      <span class="badge">🛠 防闪退</span>
     </div>
   </div>
 
   <div class="card">
     <h2>📦 下载</h2>
 
-    <a class="file" href="com.minis.minecrafthelper_1.0.0_iphoneos-arm64.deb">
+    <a class="file" href="com.minis.minecrafthelper_1.1.0_iphoneos-arm64.deb">
       <span class="ic ic-arm64">🕳</span>
       <span class="meta">
         <span class="name">rootless .deb（推荐）</span>
@@ -89,7 +95,7 @@
       <span class="arrow">›</span>
     </a>
 
-    <a class="file" href="com.minis.minecrafthelper_1.0.0_iphoneos-arm.deb">
+    <a class="file" href="com.minis.minecrafthelper_1.1.0_iphoneos-arm.deb">
       <span class="ic ic-arm">📀</span>
       <span class="meta">
         <span class="name">rootful .deb</span>
@@ -98,21 +104,30 @@
       <span class="arrow">›</span>
     </a>
 
-    <a class="file" href="MinecraftHelper-rootless.dylib">
+    <a class="file" href="MinecraftHelper-1.1.0-iGameGod.deb">
       <span class="ic ic-dylib">🧩</span>
       <span class="meta">
-        <span class="name">iGameGod dylib（无越狱）</span>
-        <span class="sub">Tweaks → Import Tweak 直接导入 · 无 substrate 也不闪退</span>
+        <span class="name">iGameGod 专用 .deb（无越狱）</span>
+        <span class="sub">iGameGod → Tweaks → Import Tweak 导入 · 修复闪退，UI 稳定显示 · 支持 Preview</span>
       </span>
       <span class="arrow">›</span>
     </a>
+  </div>
+
+  <div class="fix">
+    <b>🛠 v1.1.0 修复内容</b><br>
+    ① 修复注入后<b>无 UI</b>：UI 创建从 %ctor 早期延迟到「app 启动完成 + 2 秒」，此时 UIKit 已就绪，悬浮窗稳定显示（通知 + 6 秒兜底 + 异常保护三重保险）<br>
+    ② 修复 iGameGod 注入<b>闪退</b>：%ctor 阶段不再触碰 UIKit，全部空指针安全，注入早期绝不崩溃<br>
+    ③ 触摸穿透：悬浮窗不遮挡游戏操作<br>
+    ④ 日志路径多级回退（Documents → Caches → tmp）<br>
+    ⑤ <b>支持 Minecraft Preview 及所有版本</b>：Filter 覆盖 com.mojang.minecraftpe + com.mojang.minecraftpe.preview，可执行名 Minecraft + minecraftpe（老版本）
   </div>
 
   <div class="card">
     <h2>⚙️ 安装方式</h2>
     <ol>
       <li><b>越狱</b>：下载对应 .deb，用 Sileo / Zebra / Filza 安装，重启 Minecraft。</li>
-      <li><b>iGameGod</b>：下载 dylib → Tweaks 标签 → ➕ → 新建文件夹 → Import Tweak → 选择文件。</li>
+      <li><b>iGameGod</b>：下载 iGameGod 专用 .deb → Tweaks 标签 → ➕ → 新建文件夹 → Import Tweak → 选择 deb。</li>
       <li>进游戏后点屏幕右侧 <code>MH</code> 悬浮球打开菜单。</li>
       <li>导出日志：菜单 → <code>导出日志</code>（分享面板）/ <code>复制日志</code>。</li>
     </ol>
@@ -130,6 +145,6 @@
 
   <div class="warn">⚠️ 免责声明：仅限单机/自用测试。多人服务器使用辅助可能违反服务条款并被封号，风险自负。本隧道为临时链接，由 localhost.run 提供。</div>
 
-  <div class="foot">MinecraftHelper v1.0.0 · Theos + GitHub Actions 构建 · com.minis.minecrafthelper</div>
+  <div class="foot">MinecraftHelper v1.1.0 · Theos + GitHub Actions 构建 · com.minis.minecrafthelper</div>
 </body>
 </html>
