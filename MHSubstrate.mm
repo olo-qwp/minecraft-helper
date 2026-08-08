@@ -7,6 +7,7 @@ typedef void (*MSHookFunction_t)(void *symbol, void *replace, void **result);
 typedef void (*MSHookMessageEx_t)(Class _class, SEL sel, IMP imp, IMP *result);
 
 static void *gHandle = NULL;
+static const char *gHandlePath = "unknown";
 static MSFindSymbol_t gMSFindSymbol = NULL;
 static MSHookFunction_t gMSHookFunction = NULL;
 static MSHookMessageEx_t gMSHookMessageEx = NULL;
@@ -27,7 +28,7 @@ static void MHLoadSubstrate(void) {
         };
         for (size_t i = 0; i < sizeof(candidates) / sizeof(candidates[0]); i++) {
             void *h = dlopen(candidates[i], RTLD_NOW | RTLD_GLOBAL);
-            if (h) { gHandle = h; break; }
+            if (h) { gHandle = h; gHandlePath = candidates[i]; break; }
         }
         if (!gHandle) {
             MHLogPrint(MHLogLevelWarn, "substrate runtime not found — hooks dormant, UI/logging still active");
@@ -37,7 +38,7 @@ static void MHLoadSubstrate(void) {
         gMSHookFunction  = (MSHookFunction_t)dlsym(gHandle, "MSHookFunction");
         gMSHookMessageEx = (MSHookMessageEx_t)dlsym(gHandle, "MSHookMessageEx");
         MHLogPrint(MHLogLevelInfo, "substrate runtime loaded: %s (find=%p hook=%p msgex=%p)",
-                   candidates[0], gMSFindSymbol, gMSHookFunction, gMSHookMessageEx);
+                   gHandlePath, gMSFindSymbol, gMSHookFunction, gMSHookMessageEx);
     });
 }
 

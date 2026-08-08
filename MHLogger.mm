@@ -100,7 +100,9 @@ NSString *MHLogExportToFile(void) {
     NSString *content = MHLogContents();
     NSError *err = nil;
     BOOL ok = [content writeToFile:path atomically:YES encoding:NSUTF8StringEncoding error:&err];
-    if (!ok) MHLogPrint(MHLogLevelError, "log export failed: %@", err);
-    MHLogPrint(MHLogLevelInfo, "log exported -> %@ (%lu bytes)", path, (unsigned long)content.length);
+    if (!ok) MHLogPrint(MHLogLevelError, "log export failed: %s",
+                        err ? err.localizedDescription.UTF8String : "unknown error");
+    MHLogPrint(MHLogLevelInfo, "log exported -> %s (%lu bytes)", path.UTF8String,
+               (unsigned long)content.length);
     return path;
 }
