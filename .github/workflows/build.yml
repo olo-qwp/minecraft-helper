@@ -1,0 +1,64 @@
+name: Build MinecraftHelper
+
+on:
+  push:
+    branches: ["main", "master"]
+  workflow_dispatch:
+
+jobs:
+  build:
+    name: Build (${{ matrix.name }})
+    runs-on: macos-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: rootless
+            scheme: rootless
+            arch: iphoneos-arm64
+          - name: rootful
+            scheme: rootful
+            arch: iphoneos-arm
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Cache Theos
+        id: cache
+        uses: actions/cache@v4
+        with:
+          path: ${{ github.workspace }}/theos
+          key: theos-${{ runner.os }}
+
+      - name: Install Theos (macOS toolchain + SDKs)
+        uses: Randomblock1/theos-action@v1
+
+      - name: Configure scheme & arch
+        run: |
+          sed -i "s|^Architecture:.*|Architecture: ${{ matrix.arch }}|" control
+          if [ "${{ matrix.scheme }}" = "rootless" ]; then
+            echo "THEOS_PACKAGE_SCHEME=rootless" >> "$GITHUB_ENV"
+          fi
+
+      - name: Build package
+        run: |
+          make clean
+          make package FINALPACKAGE=1
+          ls -la packages/
+
+      - name: Collect dylib (for iGameGod import)
+        run: |
+          mkdir -p dylib-out
+          find .theos -name "MinecraftHelper.dylib" -exec cp {} dylib-out/ \;
+          ls -la dylib-out/
+
+      - name: Upload .deb
+        uses: actions/upload-artifact@v4
+        with:
+          name: MinecraftHelper-${{ matrix.name }}-deb
+          path: packages/*.deb
+
+      - name: Upload .dylib
+        uses: actions/upload-artifact@v4
+        with:
+          name: MinecraftHelper-${{ matrix.name }}-dylib
+          path: dylib-out/

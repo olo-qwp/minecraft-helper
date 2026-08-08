@@ -1,0 +1,10 @@
+#!/bin/sh
+# MinecraftHelper postinst: 安装完整性校验 + 重启游戏进程使 tweak 生效
+if [ -f /var/jb/Library/MobileSubstrate/DynamicLibraries/MinecraftHelper.plist ] || \
+   [ -f /Library/MobileSubstrate/DynamicLibraries/MinecraftHelper.plist ]; then
+  echo "MinecraftHelper: plist 安装校验 OK"
+else
+  echo "MinecraftHelper: WARNING plist 未在预期路径找到"
+fi
+killall Minecraft 2>/dev/null || true
+exit 0
