@@ -45,6 +45,11 @@ jobs:
             echo "THEOS_PACKAGE_SCHEME=rootless" >> "$GITHUB_ENV"
           fi
 
+      - name: Fix maintainer script permissions (iSH cannot set exec bit)
+        run: |
+          chmod 755 layout/DEBIAN/postinst
+          ls -l layout/DEBIAN/
+
       - name: Build package
         run: |
           make clean
